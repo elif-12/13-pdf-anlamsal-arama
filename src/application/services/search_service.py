@@ -11,7 +11,7 @@ from src.domain.entities.document import Document, DocumentStatus
 from src.infrastructure.repositories.document_repository import DocumentRepository
 from src.rag.chunker import TextChunker
 from src.rag.pdf_extractor import PDFExtractor
-from src.rag.vector_store import SearchResult, VectorStore
+from src.rag.vector_store import SearchResult, get_vector_store
 
 
 class SearchService:
@@ -20,7 +20,7 @@ class SearchService:
         self._repo = DocumentRepository(db)
         self._extractor = PDFExtractor()
         self._chunker = TextChunker()
-        self._vector_store = VectorStore()
+        self._vector_store = get_vector_store()
 
     def upload_document(
         self,

@@ -9,6 +9,7 @@ from loguru import logger
 
 from src.api.routes.documents_router import router as documents_router
 from src.infrastructure.database.connection import create_tables
+from src.rag.vector_store import get_vector_store
 
 app = FastAPI(
     title="PDF Semantic Search",
@@ -30,6 +31,11 @@ app.include_router(documents_router)
 def startup():
     logger.info("Uygulama baslatiliyor...")
     create_tables()
+    # Embedding modelini burada isitiyoruz: ilk yukleme saniyeler surebilir
+    # (bkz. vector_store.get_vector_store). Bunu startup'ta yapmazsak, sunucu
+    # acildiktan sonra ilk istegi atan kullanici bu bekleme suresini yasar.
+    logger.info("Embedding modeli isitiliyor...")
+    get_vector_store()
     logger.info("PDF Semantic Search hazir!")
 
 

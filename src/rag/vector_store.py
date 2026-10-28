@@ -5,12 +5,33 @@ PDF chunklari buraya kaydedilir ve anlamsal benzerlik aramasi yapilir.
 Embedding modeli: local/ucretsiz sentence-transformers (all-MiniLM-L6-v2).
 API key gerektirmez, internet olmadan da calisir (model bir kere indirilir).
 """
+import os
 from dataclasses import dataclass
 from typing import List, Optional
 
 import chromadb
 from chromadb.utils import embedding_functions
 from loguru import logger
+
+
+def _load_embedding_function(model_name: str):
+    """
+    Model diskte cache'liyse HF Hub'a sormadan (offline) yukler: hub her
+    baslangicta "guncel mi" diye sorup saniyeler suren bir ag cagrisi yapar,
+    oysa model pratikte hic degismez. Cache yoksa (ilk calistirma) online
+    indirmeye otomatik duser.
+    """
+    previous = os.environ.get("HF_HUB_OFFLINE")
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    try:
+        return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model_name)
+    except Exception:
+        logger.info("Model cache'de bulunamadi, internetten indiriliyor...")
+        if previous is None:
+            os.environ.pop("HF_HUB_OFFLINE", None)
+        else:
+            os.environ["HF_HUB_OFFLINE"] = previous
+        return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model_name)
 
 
 @dataclass
@@ -38,9 +59,7 @@ class VectorStore:
 
     def __init__(self, persist_dir: str = "./chroma_db"):
         self._client = chromadb.PersistentClient(path=persist_dir)
-        self._embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-            model_name=self.EMBEDDING_MODEL
-        )
+        self._embedding_fn = _load_embedding_function(self.EMBEDDING_MODEL)
         self._collection = self._client.get_or_create_collection(
             name=self.COLLECTION_NAME,
             embedding_function=self._embedding_fn,
@@ -129,3 +148,22 @@ class VectorStore:
 
     def get_chunk_count(self) -> int:
         return self._collection.count()
+
+
+_singleton: Optional[VectorStore] = None
+
+
+def get_vector_store(persist_dir: str = "./chroma_db") -> VectorStore:
+    """
+    Paylasilan VectorStore ornegini dondurur (process icinde tek sefer kurulur).
+
+    VectorStore her kurulusta embedding modelini belleğe yukler; bu islem ilk
+    seferinde saniyeler surebilir (bkz. main.py startup - modeli onceden isitir).
+    Her istekte yeni VectorStore olusturmak bu maliyeti tekrar tekrar odetir ve
+    ChromaDB baglantisini gereksiz yere yeniden acar; bu yuzden tek instance
+    process boyunca paylasilir.
+    """
+    global _singleton
+    if _singleton is None:
+        _singleton = VectorStore(persist_dir)
+    return _singleton
