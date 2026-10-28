@@ -2,8 +2,12 @@
 ChromaDB ile vektor veritabani islemleri.
 PDF chunklari buraya kaydedilir ve anlamsal benzerlik aramasi yapilir.
 
-Embedding modeli: local/ucretsiz sentence-transformers (all-MiniLM-L6-v2).
-API key gerektirmez, internet olmadan da calisir (model bir kere indirilir).
+Embedding modeli: local/ucretsiz sentence-transformers, coklu dil destekli
+(paraphrase-multilingual-MiniLM-L12-v2). Bu sayede dokuman Ingilizce,
+sorgu Turkce (veya tam tersi) olsa bile anlamsal eslesme calisir: model
+ayni anlami tasiyan farkli dillerdeki cumleleri vektor uzayinda birbirine
+yakin yerlestirir. API key gerektirmez, internet olmadan da calisir
+(model bir kere indirilir, ~420MB).
 """
 import os
 from dataclasses import dataclass
@@ -55,7 +59,7 @@ class VectorStore:
     """
 
     COLLECTION_NAME = "pdf_chunks"
-    EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+    EMBEDDING_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
 
     def __init__(self, persist_dir: str = "./chroma_db"):
         self._client = chromadb.PersistentClient(path=persist_dir)

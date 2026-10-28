@@ -12,7 +12,8 @@ metni gorsel olarak vurgular.
 1. PDF yuklenir -> metni sayfa sayfa cikarilir (PyMuPDF).
 2. Metin kucuk parcalara (chunk) bolunur.
 3. Her parca bir embedding vektorune cevrilir ve ChromaDB'ye kaydedilir
-   (yerel/ucretsiz `sentence-transformers` modeli — API key gerekmez).
+   (yerel/ucretsiz, coklu dil destekli `sentence-transformers` modeli — API
+   key gerekmez).
 4. Arama sorgusu da vektore cevrilir, en yakin parcalar kosinus benzerligine
    gore siralanir.
 5. Arayuz, en alakali sonuca tikladiginda PDF'i o sayfaya gotirur ve
@@ -20,6 +21,9 @@ metni gorsel olarak vurgular.
 
 ## Ozellikler
 - Dogal dilde sorguyla PDF icinde anlamsal arama
+- Coklu dil (cross-lingual) arama: dokuman Ingilizce, sorgu Turkce olabilir
+  (veya tam tersi) — model ayni anlami tasiyan cumleleri dilden bagimsiz
+  olarak vektor uzayinda birbirine yakin yerlestirir
 - Sonuc -> sayfaya atlama + metin vurgulama (tarayicida, pdf.js ile)
 - Birden fazla PDF yukleyip aralarinda gecis yapma
 - Android istemcisi (bkz. [mobile/](mobile/README.md)) — ayni arayuzu telefonda acar
