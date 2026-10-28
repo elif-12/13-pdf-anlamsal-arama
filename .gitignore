@@ -1,0 +1,24 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Veritabani
+*.db
+*.db-shm
+*.db-wal
+
+# Vektor veritabani (indekslenen embedding'ler, PDF basina yeniden olusur)
+chroma_db/
+
+# Yuklenen PDF'ler
+uploads/
+
+# Ortam degiskenleri
+.env
+
+# VS Code
+.vscode/
