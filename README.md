@@ -22,9 +22,19 @@ metni gorsel olarak vurgular.
 - Dogal dilde sorguyla PDF icinde anlamsal arama
 - Sonuc -> sayfaya atlama + metin vurgulama (tarayicida, pdf.js ile)
 - Birden fazla PDF yukleyip aralarinda gecis yapma
+- Android istemcisi (bkz. [mobile/](mobile/README.md)) — ayni arayuzu telefonda acar
 - Clean Architecture + Repository Pattern (domain / application / infrastructure / api / rag)
 - FastAPI REST API, SQLite (doküman metadata), ChromaDB (vektorler)
 - Unit testler (chunker, entity)
+
+## Performans
+Embedding modeli ve ChromaDB baglantisi process icinde tek sefer kurulup
+(`get_vector_store()`) tum isteklerde paylasilir, ve `main.py` acilisinda
+onceden isitilir. Bunu yapmasaydik: sunucu her yeniden basladiginda, ilk
+istegi atan kullanici modelin bellege yuklenmesini (~saniyeler) beklemek
+zorunda kalirdi — biz bunu olcup dogruladik (ilk istek 18s → 150ms). Model
+diskte cache'liyse HuggingFace Hub'a "guncel mi" diye sormadan (offline)
+yuklenir, bu da gereksiz bir ag cagrisini ortadan kaldirir.
 
 ## Kurulum
 
@@ -70,8 +80,14 @@ pdf-semantic-search/
 ├── tests/               # Unit testler
 ├── uploads/             # Yuklenen PDF'ler (git'e girmez)
 ├── ui.html              # Tek sayfalik arayuz (pdf.js ile PDF goruntuleme + vurgulama)
+├── mobile/              # Android istemcisi (Flutter, ui.html'i WebView'de acar)
 └── main.py              # Uygulama giris noktasi
 ```
+
+## Android uygulamasi
+`mobile/` klasorunde, bu ayni arayuzu bir Android WebView icinde acan kucuk
+bir Flutter istemcisi var. Kurulum ve calistirma adimlari icin
+[mobile/README.md](mobile/README.md)'ye bak.
 
 ## API ozeti
 | Method | Endpoint | Aciklama |

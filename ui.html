@@ -71,12 +71,18 @@
     padding: 14px 16px;
     border-bottom: 1px solid var(--border);
   }
-  .sidebar-section h2 {
+  .sidebar-section h2, .search-section h2 {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: .04em;
     color: var(--text-dim);
     margin: 0 0 10px;
+  }
+  .doc-list-section {
+    flex: 0 0 auto;
+    max-height: 220px;
+    display: flex;
+    flex-direction: column;
   }
   #docList { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
   .doc-item {
@@ -208,6 +214,25 @@
     font-size: 14px;
     max-width: 320px;
   }
+
+  /* Dar ekranlar (telefon): sidebar'i ustte sinirli yukseklikte goster,
+     PDF goruntuleyici alttaki kalan alani kullansin. Bu sayfa, Flutter
+     mobil uygulamasinda bir WebView icinde bu haliyle acilir. */
+  @media (max-width: 720px) {
+    .layout { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      min-width: 0;
+      max-height: 46vh;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .doc-list-section { max-height: 120px; }
+    .viewer { min-height: 0; }
+    .viewer-stage { padding: 10px; }
+    header { padding: 10px 14px; }
+    header h1 { font-size: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -226,12 +251,12 @@
         <input type="file" id="fileInput" accept="application/pdf" />
       </label>
     </div>
-    <div class="sidebar-section" style="flex: 0 0 auto; max-height: 220px; display:flex; flex-direction:column;">
+    <div class="sidebar-section doc-list-section">
       <h2>Dokümanlar</h2>
       <ul id="docList"></ul>
     </div>
     <div class="search-section">
-      <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);margin:0 0 10px;">Ara</h2>
+      <h2>Ara</h2>
       <div class="search-row">
         <input id="queryInput" type="text" placeholder="Ne arıyorsun? (örn. motor bakım periyodu)" disabled />
         <button id="searchBtn" disabled>Ara</button>

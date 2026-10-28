@@ -1,0 +1,12 @@
+# flutter create --platforms=android . bu klasorleri uretecek,
+# bunlar makineye/surume ozel oldugu icin repo'ya girmesin.
+.dart_tool/
+.flutter-plugin-dependencies
+.packages
+build/
+android/.gradle/
+android/gradle-wrapper.jar
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+*.iml
+.idea/
