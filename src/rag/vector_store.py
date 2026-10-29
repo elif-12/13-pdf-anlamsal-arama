@@ -9,7 +9,6 @@ ayni anlami tasiyan farkli dillerdeki cumleleri vektor uzayinda birbirine
 yakin yerlestirir. API key gerektirmez, internet olmadan da calisir
 (model bir kere indirilir, ~420MB).
 """
-import os
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -20,21 +19,20 @@ from loguru import logger
 
 def _load_embedding_function(model_name: str):
     """
-    Model diskte cache'liyse HF Hub'a sormadan (offline) yukler: hub her
-    baslangicta "guncel mi" diye sorup saniyeler suren bir ag cagrisi yapar,
-    oysa model pratikte hic degismez. Cache yoksa (ilk calistirma) online
-    indirmeye otomatik duser.
+    Model diskte cache'liyse HF Hub'a sormadan yukler: hub her baslangicta
+    "guncel mi" diye sorup saniyeler suren bir ag cagrisi yapar, oysa model
+    pratikte hic degismez. Cache yoksa (ilk calistirma) internetten indirir.
+
+    HF_HUB_OFFLINE ortam degiskeni burada kullanilamaz: huggingface_hub onu
+    import aninda bir kez okur, sonradan geri almak ayni process'te etkisizdir
+    ve ilk calistirmada indirme hic yapilamaz.
     """
-    previous = os.environ.get("HF_HUB_OFFLINE")
-    os.environ["HF_HUB_OFFLINE"] = "1"
     try:
-        return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model_name)
+        return embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name=model_name, local_files_only=True
+        )
     except Exception:
         logger.info("Model cache'de bulunamadi, internetten indiriliyor...")
-        if previous is None:
-            os.environ.pop("HF_HUB_OFFLINE", None)
-        else:
-            os.environ["HF_HUB_OFFLINE"] = previous
         return embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model_name)
 
 
